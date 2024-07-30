@@ -1,0 +1,16 @@
+main: com.rooxchicken.hourly.Hourly
+name: HourlyS3
+version: 0.1
+api-version: '1.21'
+
+commands:
+   giveitems:
+      usage: /giveitems
+   setrate:
+      usage: /setrate
+   afk:
+      usage: /afk
+   withdraw:
+      usage: /withdraw
+      
+depend: [ ProtocolLib ]
