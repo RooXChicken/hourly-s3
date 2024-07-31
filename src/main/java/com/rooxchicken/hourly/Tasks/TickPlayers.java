@@ -8,7 +8,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 import com.rooxchicken.hourly.Hourly;
-import com.rooxchicken.hourly.Data.DataManager;
+import com.rooxchicken.hourly.Data.TimeManager;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -30,8 +30,8 @@ public class TickPlayers extends Task
     {
         for(Player player : Bukkit.getOnlinePlayers())
         {
-            player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(Math.min(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue(), plugin.dataManager.getMaxHealth(player)));
-            double stopwatches = plugin.dataManager.getStopwatches(player)/2.0;
+            player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(Math.min(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue(), plugin.timeManager.getMaxHealth(player)));
+            double stopwatches = plugin.timeManager.getStopwatches(player)/2.0;
 
             plugin.afkManager.tick(player);
             if(plugin.afkManager.isAFK(player))
@@ -40,12 +40,12 @@ public class TickPlayers extends Task
                 continue;
             }
 
-            if(plugin.dataManager.getMaxHealth(player) == player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue())
+            if(plugin.timeManager.getMaxHealth(player) == player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue())
             {
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getStopwatchColor((int)(stopwatches*2)) + stopwatches + "§f | §bMAX"));
                 continue;
             }
-            int time = plugin.dataManager.getTime(player);
+            int time = plugin.timeManager.getTime(player);
             int _minutes = + time / 60;
             int _seconds = time % 60;
             String minutes = ((_minutes < 10) ? "0" : "") + _minutes;
@@ -56,11 +56,11 @@ public class TickPlayers extends Task
             
             if(time <= 0)
             {
-                plugin.dataManager.handleTimeup(player);
+                plugin.timeManager.handleTimeup(player);
                 return;
             }
 
-            plugin.dataManager.setTime(player, time - 1);
+            plugin.timeManager.setTime(player, time - 1);
         }
     }
 

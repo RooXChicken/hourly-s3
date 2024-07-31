@@ -39,7 +39,7 @@ public class Withdraw implements CommandExecutor
 
         for(int i = 0; i < count; i++)
         {
-            if(plugin.dataManager.withdraw(player))
+            if(plugin.timeManager.withdraw(player))
             {
                 if(player.getInventory().firstEmpty() != -1)
                     player.getInventory().addItem(plugin.stopwatch);

@@ -46,6 +46,8 @@ import com.rooxchicken.hourly.Commands.SetRate;
 import com.rooxchicken.hourly.Commands.Withdraw;
 import com.rooxchicken.hourly.Data.AFKManager;
 import com.rooxchicken.hourly.Data.DataManager;
+import com.rooxchicken.hourly.Data.TimeManager;
+import com.rooxchicken.hourly.Data.KitManager;
 import com.rooxchicken.hourly.Tasks.Task;
 import com.rooxchicken.hourly.Tasks.TickPlayers;
 
@@ -60,7 +62,9 @@ public class Hourly extends JavaPlugin implements Listener
     public static NamespacedKey stopwatchesKey;
 
     public DataManager dataManager;
+    public TimeManager timeManager;
     public AFKManager afkManager;
+    public KitManager kitManager;
 
     public ItemStack stopwatch;
 
@@ -68,10 +72,16 @@ public class Hourly extends JavaPlugin implements Listener
     public void onEnable()
     {
         dataManager = new DataManager(this);
+        timeManager = new TimeManager(this);
         afkManager = new AFKManager(this);
+        kitManager = new KitManager(this);
+
+        saveDefaultConfig();
+        dataManager.loadSettings();
 
         tasks = new ArrayList<Task>();
         tasks.add(new TickPlayers(this));
+        tasks.add(kitManager);
 
         {
             stopwatch = new ItemStack(Material.PAPER);
@@ -139,7 +149,7 @@ public class Hourly extends JavaPlugin implements Listener
 
         if(item != null && item.hasItemMeta() && item.getItemMeta().equals(stopwatch.getItemMeta()))
         {
-            if(!dataManager.addStopwatch(player))
+            if(!timeManager.addStopwatch(player))
                 return;
 
             item.setAmount(item.getAmount() - 1);
@@ -152,7 +162,7 @@ public class Hourly extends JavaPlugin implements Listener
     {
         Player player = event.getEntity();
 
-        int stopwatches = dataManager.getStopwatches(player) - 1;
+        int stopwatches = timeManager.getStopwatches(player) - 1;
 
         if(stopwatches < 0)
         {
@@ -167,7 +177,7 @@ public class Hourly extends JavaPlugin implements Listener
             return;
         }
 
-        dataManager.setStopwatches(player, stopwatches);
+        timeManager.setStopwatches(player, stopwatches);
 
         if(player.getKiller() == null)
         {
@@ -176,9 +186,9 @@ public class Hourly extends JavaPlugin implements Listener
         else
         {
             Player killer = player.getKiller();
-            if(dataManager.getStopwatches(killer) < 5)
+            if(timeManager.getStopwatches(killer) < 5)
             {
-                dataManager.addStopwatch(killer);
+                timeManager.addStopwatch(killer);
                 killer.sendMessage("§2You have stolen a stopwatch!");
             }
             else
