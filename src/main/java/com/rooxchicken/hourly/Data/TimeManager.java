@@ -80,6 +80,11 @@ public class TimeManager
 
     public boolean addStopwatch(Player player)
     {
+        if(plugin.isGuest(player))
+        {
+            player.sendMessage("§4Guests cannot use stopwatches!");
+            return false;
+        }
         if(getStopwatches(player) >= 5)
         {
             player.sendMessage("§4You are at the max amount of stopwatches!");

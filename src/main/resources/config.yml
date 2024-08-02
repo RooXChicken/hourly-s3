@@ -2,6 +2,12 @@
 # [NUMBER] DEFAULT: 0
 kit-progression: 0
 
+# List of guest players
+guests: [
+  PLAYER,
+  PLAYER
+]
+
 # Progression 0 Map
 # [ITEMTYPE.TYPE.VALUE] (SEE: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html, https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/enchantments/Enchantment.html)
 progression0-map: [

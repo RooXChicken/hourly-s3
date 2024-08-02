@@ -32,6 +32,8 @@ public class Withdraw implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
     {
         Player player = Bukkit.getPlayer(sender.getName());
+        if(plugin.isGuest(player))
+            return true;
         
         int count = 1;
         if(args.length > 0)

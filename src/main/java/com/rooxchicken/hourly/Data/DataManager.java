@@ -1,5 +1,6 @@
 package com.rooxchicken.hourly.Data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
@@ -12,6 +13,8 @@ import com.rooxchicken.hourly.Hourly;
 public class DataManager
 {
     private Hourly plugin;
+
+    public ArrayList<String> guestPlayers;
 
     public int KIT_PROGRESSION = 0;
     public HashMap<Material, Integer> currentItemProgression;
@@ -40,11 +43,14 @@ public class DataManager
         progression0EnchantMap = new HashMap<Enchantment, Integer>();
         progression1EnchantMap = new HashMap<Enchantment, Integer>();
         progression2EnchantMap = new HashMap<Enchantment, Integer>();
+
+        guestPlayers = new ArrayList<String>();
     }
 
     public void saveSettings()
     {
         plugin.getConfig().set("kit-progression", KIT_PROGRESSION);
+        plugin.saveConfig();
     }
 
     public void loadSettings()
@@ -52,6 +58,11 @@ public class DataManager
         plugin.reloadConfig();
         progression0ItemMap.clear();
         KIT_PROGRESSION = plugin.getConfig().getInt("kit-progression");
+
+        for(String player : plugin.getConfig().getStringList("guests"))
+        {
+            guestPlayers.add(player.toLowerCase());
+        }
 
         for(String _data : plugin.getConfig().getStringList("progression0-map"))
         {
@@ -71,6 +82,29 @@ public class DataManager
                     switch(data[2])
                     {
                         case "LIMIT": progression0EnchantMap.put(Enchantment.getByName(data[1]), Integer.parseInt(data[3])); break;
+                    }
+                break;
+            }
+        }
+
+        for(String _data : plugin.getConfig().getStringList("progression1-map"))
+        {
+            String[] data = _data.toString().split("\\.");
+            switch(data[0])
+            {
+                case "WORLDBORDER":
+                    progression1WorldBorder = Integer.parseInt(data[1]);
+                break;
+                case "ITEM":
+                    switch(data[2])
+                    {
+                        case "LIMIT": progression1ItemMap.put(Material.getMaterial(data[1]), Integer.parseInt(data[3])); break;
+                    }
+                break;
+                case "ENCHANT":
+                    switch(data[2])
+                    {
+                        case "LIMIT": progression1EnchantMap.put(Enchantment.getByName(data[1]), Integer.parseInt(data[3])); break;
                     }
                 break;
             }
@@ -97,7 +131,7 @@ public class DataManager
         
         for(World world : Bukkit.getWorlds())
         {
-            world.getWorldBorder().setSize(currentWorldBorder);
+            world.getWorldBorder().setSize(currentWorldBorder, 30);
         }
     }
 }

@@ -4,8 +4,10 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Statistic;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import com.rooxchicken.hourly.Hourly;
 import com.rooxchicken.hourly.Data.TimeManager;
@@ -28,8 +30,14 @@ public class TickPlayers extends Task
 
     public void execute()
     {
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
         for(Player player : Bukkit.getOnlinePlayers())
         {
+            scoreboard.getObjective("timeAlive").getScore(player.getName()).setScore(player.getStatistic(Statistic.TIME_SINCE_DEATH) / 1200);
+
+            if(plugin.isGuest(player))
+                plugin.timeManager.setStopwatches(player, 2);
+
             player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(Math.min(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue(), plugin.timeManager.getMaxHealth(player)));
             double stopwatches = plugin.timeManager.getStopwatches(player)/2.0;
 

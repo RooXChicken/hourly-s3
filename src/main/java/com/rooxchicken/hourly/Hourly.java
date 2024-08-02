@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
 import org.bukkit.Sound;
+import org.bukkit.Statistic;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -23,6 +24,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -31,6 +33,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import com.comphenix.protocol.PacketType;
@@ -67,6 +70,7 @@ public class Hourly extends JavaPlugin implements Listener
     public KitManager kitManager;
 
     public ItemStack stopwatch;
+    public ItemStack netheriteKey;
 
     @Override
     public void onEnable()
@@ -98,7 +102,32 @@ public class Hourly extends JavaPlugin implements Listener
             stopwatch.setItemMeta(meta);
         }
 
+        {
+            netheriteKey = new ItemStack(Material.PAPER);
+            ItemMeta meta = netheriteKey.getItemMeta();
+            meta.setDisplayName("§8§lNetherite Key");
+            meta.setCustomModelData(2);
+            ArrayList<String> lore = new ArrayList<String>();
+
+            lore.add("§8Unlocks the next progression!");
+
+            meta.setLore(lore);
+            netheriteKey.setItemMeta(meta);
+        }
+
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+
+        boolean create = true;
+        for(Objective objective : scoreboard.getObjectives())
+        {
+            if(objective.getName().equals("timeAlive"))
+                create = false;
+        }
+        if(create)
+            scoreboard.registerNewObjective("timeAlive", Criteria.DUMMY, "timeAlive");
+
+        scoreboard.getObjective("timeAlive").setDisplaySlot(DisplaySlot.SIDEBAR);
+        scoreboard.getObjective("timeAlive").setDisplayName("§6Time Since Death");
     
         getServer().getPluginManager().registerEvents(this, this);
         this.getCommand("giveitems").setExecutor(new GiveItems(this));
@@ -138,6 +167,11 @@ public class Hourly extends JavaPlugin implements Listener
         getLogger().info("Hourly SMP! (since 1987) (made by roo)");
     }
 
+    public boolean isGuest(Player player)
+    {
+        return (dataManager.guestPlayers.contains(player.getName().toLowerCase()));
+    }
+
     @EventHandler
     public void useStopwatch(PlayerInteractEvent event)
     {
@@ -158,9 +192,35 @@ public class Hourly extends JavaPlugin implements Listener
     }
 
     @EventHandler
-    public void dropStopwatchOnDeaht(PlayerDeathEvent event)
+    public void useNetheriteKey(PlayerInteractEvent event)
+    {
+        if(!event.getAction().equals(Action.RIGHT_CLICK_AIR) && !event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
+            return;
+
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+
+        if(item != null && item.hasItemMeta() && item.getItemMeta().equals(netheriteKey.getItemMeta()))
+        {
+            dataManager.KIT_PROGRESSION = 1;
+            dataManager.saveSettings();
+            dataManager.loadSettings();
+
+            item.setAmount(item.getAmount() - 1);
+            for(Player p : Bukkit.getOnlinePlayers())
+            {
+                p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.4f, 1);
+                p.sendMessage("§8§lThe Netherite Key has been used!");
+            }
+        }
+    }
+
+    @EventHandler
+    public void dropStopwatchOnDeath(PlayerDeathEvent event)
     {
         Player player = event.getEntity();
+        if(isGuest(player))
+            return;
 
         int stopwatches = timeManager.getStopwatches(player) - 1;
 
@@ -186,7 +246,7 @@ public class Hourly extends JavaPlugin implements Listener
         else
         {
             Player killer = player.getKiller();
-            if(timeManager.getStopwatches(killer) < 5)
+            if(!isGuest(killer) && timeManager.getStopwatches(killer) < 5)
             {
                 timeManager.addStopwatch(killer);
                 killer.sendMessage("§2You have stolen a stopwatch!");
@@ -194,6 +254,13 @@ public class Hourly extends JavaPlugin implements Listener
             else
                 player.getWorld().dropItemNaturally(player.getLocation(), stopwatch);
         }
+    }
+
+    @EventHandler
+    public void removePlayer(PlayerQuitEvent event)
+    {
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        scoreboard.resetScores(event.getPlayer().getName());
     }
 
     @Override
