@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -12,6 +13,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
 import com.rooxchicken.hourly.Hourly;
 import com.rooxchicken.hourly.Tasks.Task;
@@ -27,7 +32,7 @@ public class KitManager extends Task
         tickThreshold = 20;
     }
 
-    public void itemLogic(Player player, ItemStack item, HashMap<Material, Integer> itemCountMap)
+    public void itemLogic(Player player, ItemStack item, HashMap<Material, Integer> itemCountMap, HashMap<PotionEffectType, Integer> potionCountMap)
     {
         if(item == null)
             return;
@@ -37,7 +42,42 @@ public class KitManager extends Task
             if(item.getItemMeta() instanceof PotionMeta)
             {
                 PotionMeta meta = (PotionMeta)item.getItemMeta();
+                PotionEffect potion = meta.getBasePotionType().getPotionEffects().get(0);
                 
+                if(plugin.dataManager.currentPotionCountProgression.containsKey(potion.getType()))
+                {
+                    if(!potionCountMap.containsKey(potion.getType()))
+                        potionCountMap.put(potion.getType(), 0);
+                    
+                    int count = potionCountMap.get(potion.getType()) + item.getAmount();
+                    int limit = plugin.dataManager.currentPotionCountProgression.get(potion.getType());
+
+                    if(count > limit)
+                    {
+                        Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), item);
+                        droppedItem.setPickupDelay(20);
+                        int first = player.getInventory().first(item);
+                        if(first == -1)
+                            first = 40;
+                        player.getInventory().clear(first);
+                        player.sendMessage("§4You have too many " + potion.getType().getKey().getKey() + "!");
+
+                        potionCountMap.replace(potion.getType(), limit);
+                        return;
+                    }
+
+                    potionCountMap.replace(potion.getType(), count);
+                }
+
+                if(plugin.dataManager.currentPotionEffectProgression.containsKey(potion.getType()))
+                {
+                    if(potion.getAmplifier() >= plugin.dataManager.currentPotionEffectProgression.get(potion.getType()))
+                    {
+                        meta.setBasePotionType(PotionType.valueOf(potion.getType().getKey().getKey()));
+                        item.setItemMeta(meta);
+                        player.sendMessage("§4Effect " + potion.getType().getKey().getKey() + " was too high!");
+                    }
+                }
             }
 
             ItemMeta meta = item.getItemMeta();
@@ -94,10 +134,11 @@ public class KitManager extends Task
         for(Player player : Bukkit.getOnlinePlayers())
         {
             HashMap<Material, Integer> itemCountMap = new HashMap<Material, Integer>();
+            HashMap<PotionEffectType, Integer> potionCountMap = new HashMap<PotionEffectType, Integer>();
 
             for(ItemStack item : player.getInventory())
             {
-                itemLogic(player, item, itemCountMap);
+                itemLogic(player, item, itemCountMap, potionCountMap);
             }
         }
     }

@@ -39,11 +39,19 @@ public class Withdraw implements CommandExecutor
         if(args.length > 0)
             count = Integer.parseInt(args[0]);
 
+        boolean hasStopwatch = false;
+
+        for(ItemStack item : player.getInventory())
+        {
+            if(item != null && item.hasItemMeta() && item.getItemMeta().equals(plugin.stopwatch.getItemMeta()))
+                hasStopwatch = true;
+        }
+
         for(int i = 0; i < count; i++)
         {
             if(plugin.timeManager.withdraw(player))
             {
-                if(player.getInventory().firstEmpty() != -1)
+                if(hasStopwatch || player.getInventory().firstEmpty() != -1)
                     player.getInventory().addItem(plugin.stopwatch);
                 else
                     player.getWorld().dropItemNaturally(player.getLocation(), plugin.stopwatch);

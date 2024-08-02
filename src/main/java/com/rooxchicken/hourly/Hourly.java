@@ -279,6 +279,7 @@ public class Hourly extends JavaPlugin implements Listener
     public void dropStopwatchOnDeath(PlayerDeathEvent event)
     {
         Player player = event.getEntity();
+        timeManager.resetTime(player);
         if(isGuest(player))
             return;
 
@@ -316,12 +317,12 @@ public class Hourly extends JavaPlugin implements Listener
         }
     }
 
-    @EventHandler
-    public void removePlayer(PlayerQuitEvent event)
-    {
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        scoreboard.resetScores(event.getPlayer().getName());
-    }
+    // @EventHandler
+    // public void removePlayer(PlayerQuitEvent event)
+    // {
+    //     Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+    //     scoreboard.resetScores(event.getPlayer().getName());
+    // }
 
     @Override
     public void onDisable()

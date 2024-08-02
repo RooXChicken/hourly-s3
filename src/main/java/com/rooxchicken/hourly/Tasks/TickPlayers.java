@@ -25,7 +25,7 @@ public class TickPlayers extends Task
         super(_plugin);
         plugin = _plugin;
 
-        tickThreshold = 20/Hourly.TICK_RATE;
+        tickThreshold = 4/Hourly.TICK_RATE;
     }
 
     public void execute()
@@ -53,7 +53,7 @@ public class TickPlayers extends Task
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getStopwatchColor((int)(stopwatches*2)) + stopwatches + "§f | §bMAX"));
                 continue;
             }
-            int time = plugin.timeManager.getTime(player);
+            int time = plugin.timeManager.getTime(player) / 6;
             int _minutes = + time / 60;
             int _seconds = time % 60;
             String minutes = ((_minutes < 10) ? "0" : "") + _minutes;
@@ -68,23 +68,23 @@ public class TickPlayers extends Task
                 return;
             }
 
-            plugin.timeManager.setTime(player, time - 1);
+            plugin.timeManager.setTime(player, plugin.timeManager.getTime(player) - 1);
         }
     }
 
     @Override
     public void run()
     {
-        if(20/Hourly.TICK_RATE <= 0)
+        if(4/Hourly.TICK_RATE <= 0)
         {
             tickThreshold = 1;
 
-            for(int i = 0; i < Hourly.TICK_RATE/20; i++)
+            for(int i = 0; i < Hourly.TICK_RATE/4.0; i++)
                 execute();
         }
         else
         {
-            tickThreshold = 20/Hourly.TICK_RATE;
+            tickThreshold = 4/Hourly.TICK_RATE;
             execute();
         }
     }

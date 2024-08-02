@@ -24,7 +24,12 @@ public class TimeManager
         double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() + (stopwatches/2.0);
         
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(Math.min(maxHealth, getMaxHealth(player)));
-        setTime(player, 60*60 - 1);
+        resetTime(player);
+    }
+
+    public void resetTime(Player player)
+    {
+        setTime(player, 60*60*6 - 1);
     }
 
     public double getMaxHealth(Player player)

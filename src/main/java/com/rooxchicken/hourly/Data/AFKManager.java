@@ -76,7 +76,7 @@ public class AFKManager
             int time = data.get(afkTimeKey, PersistentDataType.INTEGER) + 1;
             data.set(afkTimeKey, PersistentDataType.INTEGER, time);
 
-            if(time > 10*60)
+            if(time > 10*60*6)
             {
                 data.set(afkTimeKey, PersistentDataType.INTEGER, 0);
                 player.kickPlayer("Please run the /afk command to afk!");
