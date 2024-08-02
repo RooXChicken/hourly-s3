@@ -36,6 +36,8 @@ public class GiveItems implements CommandExecutor
             Player player = Bukkit.getPlayer(sender.getName());
             player.getInventory().addItem(plugin.stopwatch);
             player.getInventory().addItem(plugin.netheriteKey);
+            for(int i = 0; i < 4; i++)
+                player.getInventory().addItem(plugin.netheriteShard);
         }
 
         return true;

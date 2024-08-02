@@ -15,6 +15,7 @@ import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.Statistic;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,9 +23,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -63,6 +66,7 @@ public class Hourly extends JavaPlugin implements Listener
 
     public static NamespacedKey timeKey;
     public static NamespacedKey stopwatchesKey;
+    public static NamespacedKey netheriteKeyRecipeKey; //not at all confusing
 
     public DataManager dataManager;
     public TimeManager timeManager;
@@ -71,14 +75,22 @@ public class Hourly extends JavaPlugin implements Listener
 
     public ItemStack stopwatch;
     public ItemStack netheriteKey;
+    public ItemStack netheriteShard;
+    public ShapedRecipe netheriteKeyRecipe;
 
     @Override
     public void onEnable()
     {
+        Bukkit.resetRecipes();
+
         dataManager = new DataManager(this);
         timeManager = new TimeManager(this);
         afkManager = new AFKManager(this);
         kitManager = new KitManager(this);
+
+        timeKey = new NamespacedKey(this, "time");
+        stopwatchesKey = new NamespacedKey(this, "stopwatches");
+        netheriteKeyRecipeKey = new NamespacedKey(this, "netheriteKeyRecipe");
 
         saveDefaultConfig();
         dataManager.loadSettings();
@@ -92,6 +104,8 @@ public class Hourly extends JavaPlugin implements Listener
             ItemMeta meta = stopwatch.getItemMeta();
             meta.setDisplayName("§6§lStopwatch");
             meta.setCustomModelData(1);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
             ArrayList<String> lore = new ArrayList<String>();
 
             lore.add("§6Adds 0.5 to your stopwatch count,");
@@ -107,12 +121,39 @@ public class Hourly extends JavaPlugin implements Listener
             ItemMeta meta = netheriteKey.getItemMeta();
             meta.setDisplayName("§8§lNetherite Key");
             meta.setCustomModelData(2);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
             ArrayList<String> lore = new ArrayList<String>();
 
             lore.add("§8Unlocks the next progression!");
 
             meta.setLore(lore);
             netheriteKey.setItemMeta(meta);
+        }
+
+        {
+            netheriteShard = new ItemStack(Material.PAPER);
+            ItemMeta meta = netheriteShard.getItemMeta();
+            meta.setDisplayName("§7§lNetherite Shard");
+            meta.setCustomModelData(3);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            ArrayList<String> lore = new ArrayList<String>();
+
+            lore.add("§7One of the four shards needed to");
+            lore.add("§7craft the netherite key.");
+
+            meta.setLore(lore);
+            netheriteShard.setItemMeta(meta);
+        }
+
+        {
+            netheriteKeyRecipe = new ShapedRecipe(netheriteKeyRecipeKey, netheriteKey);
+            netheriteKeyRecipe.shape("aSa", "SaS", "aSa");
+
+            netheriteKeyRecipe.setIngredient('S', Material.PAPER);
+
+            Bukkit.addRecipe(netheriteKeyRecipe);
         }
 
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -134,9 +175,6 @@ public class Hourly extends JavaPlugin implements Listener
         this.getCommand("setrate").setExecutor(new SetRate(this));
         this.getCommand("afk").setExecutor(new GoAFK(this));
         this.getCommand("withdraw").setExecutor(new Withdraw(this));
-
-        timeKey = new NamespacedKey(this, "time");
-        stopwatchesKey = new NamespacedKey(this, "stopwatches");
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable()
         {
@@ -211,6 +249,28 @@ public class Hourly extends JavaPlugin implements Listener
             {
                 p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.4f, 1);
                 p.sendMessage("§8§lThe Netherite Key has been used!");
+            }
+        }
+    }
+
+    @EventHandler
+    private void shardsInCraft(PrepareItemCraftEvent event)
+    {
+        if(event.getRecipe() == null || !event.getRecipe().getResult().hasItemMeta())
+            return;
+
+        for(ItemStack item : event.getInventory())
+        {
+            if(item != null && item.getType().equals(Material.PAPER))
+            {
+                if(!item.hasItemMeta())
+                    event.getInventory().setResult(new ItemStack(Material.AIR));
+
+                if(item.getItemMeta().equals(netheriteKey.getItemMeta()))
+                    continue;
+                    
+                if(!item.getItemMeta().equals(netheriteShard.getItemMeta()))
+                    event.getInventory().setResult(new ItemStack(Material.AIR));
             }
         }
     }

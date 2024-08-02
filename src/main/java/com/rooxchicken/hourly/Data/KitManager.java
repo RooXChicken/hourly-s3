@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 
 import com.rooxchicken.hourly.Hourly;
 import com.rooxchicken.hourly.Tasks.Task;
@@ -30,8 +31,15 @@ public class KitManager extends Task
     {
         if(item == null)
             return;
+
         if(item.hasItemMeta())
         {
+            if(item.getItemMeta() instanceof PotionMeta)
+            {
+                PotionMeta meta = (PotionMeta)item.getItemMeta();
+                
+            }
+
             ItemMeta meta = item.getItemMeta();
             for(Map.Entry<Enchantment, Integer> enchant : meta.getEnchants().entrySet())
             {
@@ -87,7 +95,6 @@ public class KitManager extends Task
         {
             HashMap<Material, Integer> itemCountMap = new HashMap<Material, Integer>();
 
-            //itemLogic(player, player.getInventory().getItemInOffHand(), itemCountMap);
             for(ItemStack item : player.getInventory())
             {
                 itemLogic(player, item, itemCountMap);
