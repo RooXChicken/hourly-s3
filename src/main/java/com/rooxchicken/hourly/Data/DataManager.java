@@ -20,6 +20,7 @@ public class DataManager
     public ArrayList<String> juggernaughts;
 
     public int KIT_PROGRESSION = 0;
+    public int COMBAT_TIMER = 0;
     public HashMap<Material, Integer> currentItemProgression;
     public HashMap<Enchantment, Integer> currentEnchantProgression;
     public HashMap<PotionEffectType, Integer> currentPotionCountProgression;
@@ -71,6 +72,7 @@ public class DataManager
         plugin.reloadConfig();
         progression0ItemMap.clear();
         KIT_PROGRESSION = plugin.getConfig().getInt("kit-progression");
+        COMBAT_TIMER = plugin.getConfig().getInt("combat-timer");
 
         for(String player : plugin.getConfig().getStringList("guests"))
             guestPlayers.add(player.toLowerCase());

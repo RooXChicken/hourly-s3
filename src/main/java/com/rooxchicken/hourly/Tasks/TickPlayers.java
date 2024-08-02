@@ -33,6 +33,7 @@ public class TickPlayers extends Task
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
         for(Player player : Bukkit.getOnlinePlayers())
         {
+            String combat = plugin.combatManager.tickPlayer(player);
             scoreboard.getObjective("timeAlive").getScore(player.getName()).setScore(player.getStatistic(Statistic.TIME_SINCE_DEATH) / 1200);
 
             if(plugin.isGuest(player))
@@ -44,13 +45,13 @@ public class TickPlayers extends Task
             plugin.afkManager.tick(player);
             if(plugin.afkManager.isAFK(player))
             {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getStopwatchColor((int)(stopwatches*2)) + stopwatches + "§f | §bAFK"));
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getStopwatchColor((int)(stopwatches*2)) + stopwatches + "§f | §bAFK" + combat));
                 continue;
             }
 
             if(plugin.timeManager.getMaxHealth(player) == player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue())
             {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getStopwatchColor((int)(stopwatches*2)) + stopwatches + "§f | §bMAX"));
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getStopwatchColor((int)(stopwatches*2)) + stopwatches + "§f | §bMAX" + combat));
                 continue;
             }
             int time = plugin.timeManager.getTime(player) / 6;
@@ -60,7 +61,7 @@ public class TickPlayers extends Task
             String seconds = ((_seconds < 10) ? "0" : "") + _seconds;
 
             
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getStopwatchColor((int)(stopwatches*2)) + stopwatches + "§f | §b" + minutes + ":" + seconds));
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getStopwatchColor((int)(stopwatches*2)) + stopwatches + "§f | §b" + minutes + ":" + seconds + combat));
             
             if(time <= 0)
             {

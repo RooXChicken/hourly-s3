@@ -52,6 +52,7 @@ import com.rooxchicken.hourly.Commands.GoAFK;
 import com.rooxchicken.hourly.Commands.SetRate;
 import com.rooxchicken.hourly.Commands.Withdraw;
 import com.rooxchicken.hourly.Data.AFKManager;
+import com.rooxchicken.hourly.Data.CombatManager;
 import com.rooxchicken.hourly.Data.DataManager;
 import com.rooxchicken.hourly.Data.TimeManager;
 import com.rooxchicken.hourly.Data.KitManager;
@@ -73,6 +74,7 @@ public class Hourly extends JavaPlugin implements Listener
     public TimeManager timeManager;
     public AFKManager afkManager;
     public KitManager kitManager;
+    public CombatManager combatManager;
 
     public ItemStack stopwatch;
     public ItemStack netheriteKey;
@@ -88,6 +90,7 @@ public class Hourly extends JavaPlugin implements Listener
         timeManager = new TimeManager(this);
         afkManager = new AFKManager(this);
         kitManager = new KitManager(this);
+        combatManager = new CombatManager(this);
 
         timeKey = new NamespacedKey(this, "time");
         stopwatchesKey = new NamespacedKey(this, "stopwatches");
@@ -290,6 +293,7 @@ public class Hourly extends JavaPlugin implements Listener
         if(isGuest(player))
             return;
 
+        combatManager.removeCombat(player);
         int stopwatches = timeManager.getStopwatches(player) - 1;
 
         if(stopwatches < 0)
@@ -333,12 +337,15 @@ public class Hourly extends JavaPlugin implements Listener
         ((Player)event.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
     }
 
-    // @EventHandler
-    // public void removePlayer(PlayerQuitEvent event)
-    // {
-    //     Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-    //     scoreboard.resetScores(event.getPlayer().getName());
-    // }
+    @EventHandler
+    public void tattle(PlayerQuitEvent event)
+    {
+        Player player = event.getPlayer();
+        if(combatManager.isInCombat(player))
+        {
+            getServer().broadcast("§c§l" + player.getName() + " logged out in combat!", Server.BROADCAST_CHANNEL_USERS);
+        }
+    }
 
     @Override
     public void onDisable()

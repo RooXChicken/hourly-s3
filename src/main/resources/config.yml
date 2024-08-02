@@ -2,6 +2,9 @@
 # [NUMBER] DEFAULT: 0
 kit-progression: 0
 
+# The amount of time combat lasts (in seconds)
+combat-timer: 300
+
 # List of guest players
 guests:
 - PLAYER

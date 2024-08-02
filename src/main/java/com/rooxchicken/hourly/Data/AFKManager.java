@@ -71,7 +71,7 @@ public class AFKManager
         if(isAFK(player))
             return;
 
-        if(playerLocationMap.get(player).equals(playerLoc))
+        if(playerLocationMap.get(player).getBlock().getLocation().equals(playerLoc.getBlock().getLocation()) || playerLocationMap.get(player).getDirection().equals(playerLoc.getDirection()))
         {
             int time = data.get(afkTimeKey, PersistentDataType.INTEGER) + 1;
             data.set(afkTimeKey, PersistentDataType.INTEGER, time);
