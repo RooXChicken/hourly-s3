@@ -21,7 +21,7 @@ public class TimeManager
         checkHasStopwatches(player);
         
         int stopwatches = getStopwatches(player);
-        double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() + (stopwatches/2.0);
+        double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() + (stopwatches);
         
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(Math.min(maxHealth, getMaxHealth(player)));
         resetTime(player);

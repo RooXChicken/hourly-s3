@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -32,7 +33,7 @@ public class KitManager extends Task
         tickThreshold = 20;
     }
 
-    public void itemLogic(Player player, ItemStack item, HashMap<Material, Integer> itemCountMap, HashMap<PotionEffectType, Integer> potionCountMap)
+    public void itemLogic(Player player, ItemStack item, int index, HashMap<Material, Integer> itemCountMap, HashMap<PotionEffectType, Integer> potionCountMap)
     {
         if(item == null)
             return;
@@ -114,10 +115,7 @@ public class KitManager extends Task
                 Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), clone);
                 droppedItem.setPickupDelay(20);
                 clone.setAmount(item.getAmount() - (count - limit));
-                int first = player.getInventory().first(item);
-                if(first == -1)
-                    first = 40;
-                player.getInventory().setItem(first, clone);
+                player.getInventory().setItem(index, clone);
                 player.sendMessage("§4You have too many " + item.getType() + "!");
 
                 itemCountMap.replace(item.getType(), limit);
@@ -133,12 +131,21 @@ public class KitManager extends Task
     {
         for(Player player : Bukkit.getOnlinePlayers())
         {
+            if(plugin.isJuggernaught(player))
+            {
+                plugin.dataManager.selectKit(1);
+                player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40);
+            }
+            else
+                plugin.dataManager.selectKit(0);
             HashMap<Material, Integer> itemCountMap = new HashMap<Material, Integer>();
             HashMap<PotionEffectType, Integer> potionCountMap = new HashMap<PotionEffectType, Integer>();
 
+            int index = 0;
             for(ItemStack item : player.getInventory())
             {
-                itemLogic(player, item, itemCountMap, potionCountMap);
+                itemLogic(player, item, index, itemCountMap, potionCountMap);
+                index++;
             }
         }
     }

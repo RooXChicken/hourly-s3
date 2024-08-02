@@ -17,6 +17,7 @@ public class DataManager
     private Hourly plugin;
 
     public ArrayList<String> guestPlayers;
+    public ArrayList<String> juggernaughts;
 
     public int KIT_PROGRESSION = 0;
     public HashMap<Material, Integer> currentItemProgression;
@@ -56,6 +57,7 @@ public class DataManager
         progression1PotionEffectMap = new HashMap<PotionEffectType, Integer>();
 
         guestPlayers = new ArrayList<String>();
+        juggernaughts = new ArrayList<String>();
     }
 
     public void saveSettings()
@@ -71,9 +73,9 @@ public class DataManager
         KIT_PROGRESSION = plugin.getConfig().getInt("kit-progression");
 
         for(String player : plugin.getConfig().getStringList("guests"))
-        {
             guestPlayers.add(player.toLowerCase());
-        }
+        for(String player : plugin.getConfig().getStringList("juggernaughts"))
+            juggernaughts.add(player.toLowerCase());
 
         for(String _data : plugin.getConfig().getStringList("progression0-map"))
         {
@@ -135,7 +137,26 @@ public class DataManager
             }
         }
 
-        if(KIT_PROGRESSION == 0)
+        selectKit(KIT_PROGRESSION);
+
+        for(World world : Bukkit.getWorlds())
+        {
+            if(KIT_PROGRESSION == 0 && world.getWorldBorder().getSize() != progression0WorldBorder)
+            {
+                world.getWorldBorder().setSize(progression1WorldBorder/2);
+                world.getWorldBorder().setSize(progression0WorldBorder, 60);
+            }
+            else if(KIT_PROGRESSION == 1 && world.getWorldBorder().getSize() != progression1WorldBorder)
+            {
+                world.getWorldBorder().setSize(progression1WorldBorder*2);
+                world.getWorldBorder().setSize(progression1WorldBorder, 60);
+            }
+        }
+    }
+
+    public void selectKit(int kit)
+    {
+        if(kit == 0)
         {
             currentItemProgression = progression0ItemMap;
             currentEnchantProgression = progression0EnchantMap;
@@ -144,7 +165,7 @@ public class DataManager
             currentPotionCountProgression = progression0PotionCountMap;
             currentPotionEffectProgression = progression0PotionEffectMap;
         }
-        else if(KIT_PROGRESSION == 1)
+        else if(kit == 1)
         {
             currentItemProgression = progression1ItemMap;
             currentEnchantProgression = progression1EnchantMap;
@@ -152,11 +173,6 @@ public class DataManager
 
             currentPotionCountProgression = progression1PotionCountMap;
             currentPotionEffectProgression = progression1PotionEffectMap;
-        }
-
-        for(World world : Bukkit.getWorlds())
-        {
-            world.getWorldBorder().setSize(currentWorldBorder, 30);
         }
     }
 }

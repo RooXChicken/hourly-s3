@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -210,6 +211,11 @@ public class Hourly extends JavaPlugin implements Listener
         return (dataManager.guestPlayers.contains(player.getName().toLowerCase()));
     }
 
+    public boolean isJuggernaught(Player player)
+    {
+        return (dataManager.juggernaughts.contains(player.getName().toLowerCase()));
+    }
+
     @EventHandler
     public void useStopwatch(PlayerInteractEvent event)
     {
@@ -280,6 +286,7 @@ public class Hourly extends JavaPlugin implements Listener
     {
         Player player = event.getEntity();
         timeManager.resetTime(player);
+        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         if(isGuest(player))
             return;
 
@@ -315,6 +322,15 @@ public class Hourly extends JavaPlugin implements Listener
             else
                 player.getWorld().dropItemNaturally(player.getLocation(), stopwatch);
         }
+    }
+
+    @EventHandler
+    public void resetHeartsOnPop(EntityResurrectEvent event)
+    {
+        if(!(event.getEntity() instanceof Player))
+            return;
+
+        ((Player)event.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
     }
 
     // @EventHandler
