@@ -49,6 +49,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.rooxchicken.hourly.Commands.GiveItems;
 import com.rooxchicken.hourly.Commands.GoAFK;
+import com.rooxchicken.hourly.Commands.RemoveCombat;
 import com.rooxchicken.hourly.Commands.SetRate;
 import com.rooxchicken.hourly.Commands.Withdraw;
 import com.rooxchicken.hourly.Data.AFKManager;
@@ -179,6 +180,7 @@ public class Hourly extends JavaPlugin implements Listener
         this.getCommand("setrate").setExecutor(new SetRate(this));
         this.getCommand("afk").setExecutor(new GoAFK(this));
         this.getCommand("withdraw").setExecutor(new Withdraw(this));
+        this.getCommand("removecombat").setExecutor(new RemoveCombat(this));
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable()
         {

@@ -12,5 +12,6 @@ commands:
       usage: /afk
    withdraw:
       usage: /withdraw
-      
-depend: [ ProtocolLib ]
+   removecombat:
+      usage: /removecombat
+   

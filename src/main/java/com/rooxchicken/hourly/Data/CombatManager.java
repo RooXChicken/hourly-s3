@@ -1,5 +1,8 @@
 package com.rooxchicken.hourly.Data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -13,25 +16,35 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 
 import com.rooxchicken.hourly.Hourly;
 
+import net.md_5.bungee.api.chat.TextComponent;
+
 public class CombatManager implements Listener
 {
     private Hourly plugin;
     private NamespacedKey combatTimeKey;
 
+    public HashMap<Player, Player> combatList;
+    public ArrayList<Player> combatRemove;
+
     public CombatManager(Hourly _plugin)
     {
         plugin = _plugin;
         combatTimeKey = new NamespacedKey(plugin, "combatTime");
+        
+        combatList = new HashMap<Player, Player>();
+        combatRemove = new ArrayList<Player>();
 
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -58,11 +71,54 @@ public class CombatManager implements Listener
 
         player.getPersistentDataContainer().set(combatTimeKey, PersistentDataType.INTEGER, plugin.dataManager.COMBAT_TIMER * 6);
         attacker.getPersistentDataContainer().set(combatTimeKey, PersistentDataType.INTEGER, plugin.dataManager.COMBAT_TIMER * 6);
+
+        if(combatList.containsKey(player))
+            combatList.remove(player);
+        if(combatList.containsKey(attacker))
+            combatList.remove(attacker);
+            
+        combatList.put(player, attacker);
+        combatList.put(attacker, player);
     }
 
     public void removeCombat(Player player)
     {
         player.getPersistentDataContainer().set(combatTimeKey, PersistentDataType.INTEGER, 0);
+    }
+
+    @EventHandler
+    public void disableElytra(EntityToggleGlideEvent event)
+    {
+        if(!(event.getEntity() instanceof Player))
+            return;
+
+        Player player = (Player)event.getEntity();
+        if(isInCombat(player))
+            disableElytra(player);
+    }
+
+    private void disableElytra(Player player)
+    {
+        PersistentDataContainer data = player.getPersistentDataContainer();
+        PlayerInventory inventory = player.getInventory();
+
+        ItemStack chestplate = inventory.getChestplate();
+        if(chestplate == null || chestplate.getType() != Material.ELYTRA)
+            return;
+
+        chestplate = inventory.getChestplate().clone();
+
+        inventory.setChestplate(null);
+
+        if(inventory.firstEmpty() != -1)
+            inventory.addItem(chestplate);
+        else
+        {
+            player.getWorld().dropItemNaturally(player.getLocation(), chestplate);
+            player.updateInventory();
+        }
+
+        player.sendMessage("§4You cannot use Elytras in combat!");
     }
 
     @EventHandler
