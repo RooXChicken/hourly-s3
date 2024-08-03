@@ -39,7 +39,11 @@ public class TickPlayers extends Task
             if(plugin.isGuest(player))
                 plugin.timeManager.setStopwatches(player, 2);
 
-            player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(Math.min(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue(), plugin.timeManager.getMaxHealth(player)));
+            if(!plugin.isJuggernaught(player))
+                player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(Math.min(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue(), plugin.timeManager.getMaxHealth(player)));
+            else
+                player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40);
+            
             double stopwatches = plugin.timeManager.getStopwatches(player)/2.0;
 
             plugin.afkManager.tick(player);

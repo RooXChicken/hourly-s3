@@ -132,12 +132,10 @@ public class KitManager extends Task
         for(Player player : Bukkit.getOnlinePlayers())
         {
             if(plugin.isJuggernaught(player))
-            {
                 plugin.dataManager.selectKit(1);
-                player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40);
-            }
             else
-                plugin.dataManager.selectKit(0);
+                plugin.dataManager.selectKit(plugin.dataManager.KIT_PROGRESSION);
+
             HashMap<Material, Integer> itemCountMap = new HashMap<Material, Integer>();
             HashMap<PotionEffectType, Integer> potionCountMap = new HashMap<PotionEffectType, Integer>();
 

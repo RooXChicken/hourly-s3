@@ -14,6 +14,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.Statistic;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -49,6 +50,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.rooxchicken.hourly.Commands.GiveItems;
 import com.rooxchicken.hourly.Commands.GoAFK;
+import com.rooxchicken.hourly.Commands.ReloadConfig;
 import com.rooxchicken.hourly.Commands.RemoveCombat;
 import com.rooxchicken.hourly.Commands.SetRate;
 import com.rooxchicken.hourly.Commands.Withdraw;
@@ -181,6 +183,7 @@ public class Hourly extends JavaPlugin implements Listener
         this.getCommand("afk").setExecutor(new GoAFK(this));
         this.getCommand("withdraw").setExecutor(new Withdraw(this));
         this.getCommand("removecombat").setExecutor(new RemoveCombat(this));
+        this.getCommand("reloadconfig").setExecutor(new ReloadConfig(this));
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable()
         {
@@ -261,6 +264,11 @@ public class Hourly extends JavaPlugin implements Listener
                 p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.4f, 1);
                 p.sendMessage("§8§lThe Netherite Key has been used!");
             }
+
+            for(World world : Bukkit.getWorlds())
+            {
+                world.getWorldBorder().setSize(dataManager.currentWorldBorder, 60);
+            }
         }
     }
 
@@ -317,10 +325,10 @@ public class Hourly extends JavaPlugin implements Listener
         {
             player.getWorld().dropItemNaturally(player.getLocation(), stopwatch);
         }
-        else
+        else if(player.getKiller() != null && !isGuest(player.getKiller()))
         {
             Player killer = player.getKiller();
-            if(!isGuest(killer) && timeManager.getStopwatches(killer) < 5)
+            if(timeManager.getStopwatches(killer) < 5)
             {
                 timeManager.addStopwatch(killer);
                 killer.sendMessage("§2You have stolen a stopwatch!");

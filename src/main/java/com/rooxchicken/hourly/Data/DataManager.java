@@ -25,7 +25,7 @@ public class DataManager
     public HashMap<Enchantment, Integer> currentEnchantProgression;
     public HashMap<PotionEffectType, Integer> currentPotionCountProgression;
     public HashMap<PotionEffectType, Integer> currentPotionEffectProgression;
-    private int currentWorldBorder;
+    public int currentWorldBorder;
 
     private HashMap<Material, Integer> progression0ItemMap;
     private HashMap<Material, Integer> progression1ItemMap;
@@ -141,19 +141,19 @@ public class DataManager
 
         selectKit(KIT_PROGRESSION);
 
-        for(World world : Bukkit.getWorlds())
-        {
-            if(KIT_PROGRESSION == 0 && world.getWorldBorder().getSize() != progression0WorldBorder)
-            {
-                world.getWorldBorder().setSize(progression1WorldBorder/2);
-                world.getWorldBorder().setSize(progression0WorldBorder, 60);
-            }
-            else if(KIT_PROGRESSION == 1 && world.getWorldBorder().getSize() != progression1WorldBorder)
-            {
-                world.getWorldBorder().setSize(progression1WorldBorder*2);
-                world.getWorldBorder().setSize(progression1WorldBorder, 60);
-            }
-        }
+        // for(World world : Bukkit.getWorlds())
+        // {
+        //     if(KIT_PROGRESSION == 0 && world.getWorldBorder().getSize() != progression0WorldBorder)
+        //     {
+        //         world.getWorldBorder().setSize(progression1WorldBorder/2);
+        //         world.getWorldBorder().setSize(progression0WorldBorder, 60);
+        //     }
+        //     else if(KIT_PROGRESSION == 1 && world.getWorldBorder().getSize() != progression1WorldBorder)
+        //     {
+        //         world.getWorldBorder().setSize(progression1WorldBorder*2);
+        //         world.getWorldBorder().setSize(progression1WorldBorder, 60);
+        //     }
+        // }
     }
 
     public void selectKit(int kit)
