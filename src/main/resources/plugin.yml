@@ -16,4 +16,8 @@ commands:
       usage: /removecombat
    reloadconfig:
       usage: /reloadconfig
+   leaderboardremove:
+      usage: /leaderboardremove
+   leaderboardadd:
+      usage: /leaderboardadd
    

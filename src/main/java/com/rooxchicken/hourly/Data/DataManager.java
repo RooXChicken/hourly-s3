@@ -18,6 +18,7 @@ public class DataManager
 
     public ArrayList<String> guestPlayers;
     public ArrayList<String> juggernaughts;
+    public ArrayList<String> blacklistedLeaderboardPlayers;
 
     public int KIT_PROGRESSION = 0;
     public int COMBAT_TIMER = 0;
@@ -78,6 +79,8 @@ public class DataManager
             guestPlayers.add(player.toLowerCase());
         for(String player : plugin.getConfig().getStringList("juggernaughts"))
             juggernaughts.add(player.toLowerCase());
+        for(String player : plugin.getConfig().getStringList("leaderboard-blacklisted"))
+            blacklistedLeaderboardPlayers.add(player.toLowerCase());
 
         for(String _data : plugin.getConfig().getStringList("progression0-map"))
         {

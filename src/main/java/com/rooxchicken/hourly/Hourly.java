@@ -50,6 +50,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.rooxchicken.hourly.Commands.GiveItems;
 import com.rooxchicken.hourly.Commands.GoAFK;
+import com.rooxchicken.hourly.Commands.LeaderboardAdd;
+import com.rooxchicken.hourly.Commands.LeaderboardRemove;
 import com.rooxchicken.hourly.Commands.ReloadConfig;
 import com.rooxchicken.hourly.Commands.RemoveCombat;
 import com.rooxchicken.hourly.Commands.SetRate;
@@ -184,6 +186,8 @@ public class Hourly extends JavaPlugin implements Listener
         this.getCommand("withdraw").setExecutor(new Withdraw(this));
         this.getCommand("removecombat").setExecutor(new RemoveCombat(this));
         this.getCommand("reloadconfig").setExecutor(new ReloadConfig(this));
+        this.getCommand("leaderboardremove").setExecutor(new LeaderboardRemove(this));
+        this.getCommand("leaderboardadd").setExecutor(new LeaderboardAdd(this));
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable()
         {
@@ -220,6 +224,11 @@ public class Hourly extends JavaPlugin implements Listener
     }
 
     public boolean isJuggernaught(Player player)
+    {
+        return (dataManager.juggernaughts.contains(player.getName().toLowerCase()));
+    }
+
+    public boolean isLBBlacklisted(Player player)
     {
         return (dataManager.juggernaughts.contains(player.getName().toLowerCase()));
     }
@@ -300,7 +309,7 @@ public class Hourly extends JavaPlugin implements Listener
         Player player = event.getEntity();
         timeManager.resetTime(player);
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
-        if(isGuest(player))
+        if(isGuest(player) || (player.getKiller() != null && isGuest(player.getKiller())))
             return;
 
         combatManager.removeCombat(player);

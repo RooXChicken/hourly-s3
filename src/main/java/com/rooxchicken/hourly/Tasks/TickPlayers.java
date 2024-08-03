@@ -34,7 +34,8 @@ public class TickPlayers extends Task
         for(Player player : Bukkit.getOnlinePlayers())
         {
             String combat = plugin.combatManager.tickPlayer(player);
-            scoreboard.getObjective("timeAlive").getScore(player.getName()).setScore(player.getStatistic(Statistic.TIME_SINCE_DEATH) / 1200);
+            if(!plugin.isLBBlacklisted(player))
+                scoreboard.getObjective("timeAlive").getScore(player.getName()).setScore(player.getStatistic(Statistic.TIME_SINCE_DEATH) / 1200);
 
             if(plugin.isGuest(player))
                 plugin.timeManager.setStopwatches(player, 2);
