@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -55,7 +56,8 @@ public class KitManager extends Task
 
                     if(count > limit)
                     {
-                        Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), item);
+                        Item droppedItem = ((Item)player.getWorld().spawnEntity(player.getLocation(), EntityType.ITEM));
+                        droppedItem.setItemStack(item);
                         droppedItem.setPickupDelay(20);
                         int first = player.getInventory().first(item);
                         if(first == -1)
@@ -112,7 +114,8 @@ public class KitManager extends Task
             {
                 ItemStack clone = item.clone();
                 clone.setAmount((count-limit));
-                Item droppedItem = player.getWorld().dropItemNaturally(player.getLocation(), clone);
+                Item droppedItem = ((Item)player.getWorld().spawnEntity(player.getLocation(), EntityType.ITEM));
+                droppedItem.setItemStack(clone);
                 droppedItem.setPickupDelay(20);
                 clone.setAmount(item.getAmount() - (count - limit));
                 player.getInventory().setItem(index, clone);

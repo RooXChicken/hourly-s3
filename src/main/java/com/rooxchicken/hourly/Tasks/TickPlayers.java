@@ -7,6 +7,8 @@ import org.bukkit.Location;
 import org.bukkit.Statistic;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 
 import com.rooxchicken.hourly.Hourly;
@@ -35,7 +37,12 @@ public class TickPlayers extends Task
         {
             String combat = plugin.combatManager.tickPlayer(player);
             if(!plugin.isLBBlacklisted(player))
-                scoreboard.getObjective("timeAlive").getScore(player.getName()).setScore(player.getStatistic(Statistic.TIME_SINCE_DEATH) / 1200);
+            {
+                int time = player.getStatistic(Statistic.TIME_SINCE_DEATH) / 1200;
+                scoreboard.getObjective("timeAlive").getScore(player.getName()).setScore(time);
+                if(time > 500)
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 21, 0, false, false));
+            }
 
             if(plugin.isGuest(player))
                 plugin.timeManager.setStopwatches(player, 2);

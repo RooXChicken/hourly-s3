@@ -9,6 +9,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -114,7 +115,7 @@ public class CombatManager implements Listener
             inventory.addItem(chestplate);
         else
         {
-            player.getWorld().dropItemNaturally(player.getLocation(), chestplate);
+            ((Item)player.getWorld().spawnEntity(player.getLocation(), EntityType.ITEM)).setItemStack(chestplate);
             player.updateInventory();
         }
 

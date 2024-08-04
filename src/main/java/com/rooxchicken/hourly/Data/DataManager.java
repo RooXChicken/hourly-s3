@@ -60,6 +60,7 @@ public class DataManager
 
         guestPlayers = new ArrayList<String>();
         juggernaughts = new ArrayList<String>();
+        blacklistedLeaderboardPlayers = new ArrayList<String>();
     }
 
     public void saveSettings()

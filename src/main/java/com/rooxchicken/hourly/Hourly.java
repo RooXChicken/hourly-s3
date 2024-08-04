@@ -18,6 +18,8 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -230,7 +232,7 @@ public class Hourly extends JavaPlugin implements Listener
 
     public boolean isLBBlacklisted(Player player)
     {
-        return (dataManager.juggernaughts.contains(player.getName().toLowerCase()));
+        return (dataManager.blacklistedLeaderboardPlayers.contains(player.getName().toLowerCase()));
     }
 
     @EventHandler
@@ -332,7 +334,7 @@ public class Hourly extends JavaPlugin implements Listener
 
         if(player.getKiller() == null)
         {
-            player.getWorld().dropItemNaturally(player.getLocation(), stopwatch);
+            ((Item)player.getWorld().spawnEntity(player.getLocation(), EntityType.ITEM)).setItemStack(stopwatch);
         }
         else if(player.getKiller() != null && !isGuest(player.getKiller()))
         {
@@ -343,7 +345,7 @@ public class Hourly extends JavaPlugin implements Listener
                 killer.sendMessage("§2You have stolen a stopwatch!");
             }
             else
-                player.getWorld().dropItemNaturally(player.getLocation(), stopwatch);
+            ((Item)player.getWorld().spawnEntity(player.getLocation(), EntityType.ITEM)).setItemStack(stopwatch);
         }
     }
 

@@ -9,6 +9,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -54,7 +56,7 @@ public class Withdraw implements CommandExecutor
                 if(hasStopwatch || player.getInventory().firstEmpty() != -1)
                     player.getInventory().addItem(plugin.stopwatch);
                 else
-                    player.getWorld().dropItemNaturally(player.getLocation(), plugin.stopwatch);
+                    ((Item)player.getWorld().spawnEntity(player.getLocation(), EntityType.ITEM)).setItemStack(plugin.stopwatch);
             }
             else
                 return true;
