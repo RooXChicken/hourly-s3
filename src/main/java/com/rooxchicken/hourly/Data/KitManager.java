@@ -44,41 +44,44 @@ public class KitManager extends Task
             if(item.getItemMeta() instanceof PotionMeta)
             {
                 PotionMeta meta = (PotionMeta)item.getItemMeta();
-                PotionEffect potion = meta.getBasePotionType().getPotionEffects().get(0);
-                
-                if(plugin.dataManager.currentPotionCountProgression.containsKey(potion.getType()))
+                if(meta.getBasePotionType().getPotionEffects().size() > 0)
                 {
-                    if(!potionCountMap.containsKey(potion.getType()))
-                        potionCountMap.put(potion.getType(), 0);
+                    PotionEffect potion = meta.getBasePotionType().getPotionEffects().get(0);
                     
-                    int count = potionCountMap.get(potion.getType()) + item.getAmount();
-                    int limit = plugin.dataManager.currentPotionCountProgression.get(potion.getType());
-
-                    if(count > limit)
+                    if(plugin.dataManager.currentPotionCountProgression.containsKey(potion.getType()))
                     {
-                        Item droppedItem = ((Item)player.getWorld().spawnEntity(player.getLocation(), EntityType.ITEM));
-                        droppedItem.setItemStack(item);
-                        droppedItem.setPickupDelay(20);
-                        int first = player.getInventory().first(item);
-                        if(first == -1)
-                            first = 40;
-                        player.getInventory().clear(first);
-                        player.sendMessage("§4You have too many " + potion.getType().getKey().getKey() + "!");
+                        if(!potionCountMap.containsKey(potion.getType()))
+                            potionCountMap.put(potion.getType(), 0);
+                        
+                        int count = potionCountMap.get(potion.getType()) + item.getAmount();
+                        int limit = plugin.dataManager.currentPotionCountProgression.get(potion.getType());
 
-                        potionCountMap.replace(potion.getType(), limit);
-                        return;
+                        if(count > limit)
+                        {
+                            Item droppedItem = ((Item)player.getWorld().spawnEntity(player.getLocation(), EntityType.ITEM));
+                            droppedItem.setItemStack(item);
+                            droppedItem.setPickupDelay(20);
+                            int first = player.getInventory().first(item);
+                            if(first == -1)
+                                first = 40;
+                            player.getInventory().clear(first);
+                            player.sendMessage("§4You have too many " + potion.getType().getKey().getKey() + "!");
+
+                            potionCountMap.replace(potion.getType(), limit);
+                            return;
+                        }
+
+                        potionCountMap.replace(potion.getType(), count);
                     }
 
-                    potionCountMap.replace(potion.getType(), count);
-                }
-
-                if(plugin.dataManager.currentPotionEffectProgression.containsKey(potion.getType()))
-                {
-                    if(potion.getAmplifier() >= plugin.dataManager.currentPotionEffectProgression.get(potion.getType()))
+                    if(plugin.dataManager.currentPotionEffectProgression.containsKey(potion.getType()))
                     {
-                        meta.setBasePotionType(PotionType.valueOf(potion.getType().getKey().getKey()));
-                        item.setItemMeta(meta);
-                        player.sendMessage("§4Effect " + potion.getType().getKey().getKey() + " was too high!");
+                        if(potion.getAmplifier() >= plugin.dataManager.currentPotionEffectProgression.get(potion.getType()))
+                        {
+                            meta.setBasePotionType(PotionType.valueOf(potion.getType().getKey().getKey()));
+                            item.setItemMeta(meta);
+                            player.sendMessage("§4Effect " + potion.getType().getKey().getKey() + " was too high!");
+                        }
                     }
                 }
             }
